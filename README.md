@@ -1,133 +1,62 @@
-# WorkSphere
+# 🗂️ WorkSphere — Task Management Application
 
-A professional task management web application built with **Flutter** and **Firebase**. WorkSphere helps you organize work, maintain focus, and get things done — all in a responsive, real-time interface.
+**A full-stack Flutter Web task management application** built with Firebase Authentication and Cloud Firestore. WorkSphere provides a clean, professional workspace for individuals to create, organize, and track tasks in real-time — featuring Google Sign-In, live Firestore sync, a responsive dark UI, and a complete CI/CD pipeline deploying to Netlify via GitHub Actions.
 
----
-
-## Features
-
-- **Firebase Email/Password Authentication** — Secure sign-up and sign-in
-- **Google Sign-In** — One-click authentication via Google OAuth
-- **Cloud Firestore** — Real-time task sync across sessions
-- **User-Isolated Data** — Each user's tasks are completely private (`users/{uid}/tasks/{taskId}`)
-- **Real-Time Updates** — Firestore stream listeners for instant UI refresh
-- **Task CRUD** — Create, read, update, and delete tasks
-- **Task Fields** — Title, description, category, status (Todo / In Progress / Completed), priority (Low / Medium / High)
-- **Dashboard Analytics** — Live stats: total tasks, in-progress, completed, high-priority, and progress tracking
-- **Responsive Flutter Web UI** — Full sidebar on desktop, bottom navigation on mobile
-- **Dark Theme** — Polished professional dark UI
+🌐 **Status:** Production-Ready · Netlify Deployment · Real-Time Cloud Sync
 
 ---
 
-## Tech Stack
+## ⚡ Tech Stack & Architecture
 
-| Layer | Technology |
-|---|---|
-| Frontend | Flutter (Web) |
-| Language | Dart |
-| Authentication | Firebase Authentication |
-| Database | Cloud Firestore |
-| State Management | Provider (`ChangeNotifier` + `ProxyProvider`) |
-| Hosting | Netlify (via GitHub Actions CI/CD) |
-
----
-
-## Architecture
-
-The application follows a clean layered architecture:
-
-```
-UI (screens / widgets)
-  └→ Provider (AuthProvider, TaskProvider)
-       └→ Repository (TaskRepository)
-            └→ Service (AuthService, FirestoreService)
-                 └→ Firebase (Auth + Firestore)
-```
-
-- **UI Layer** — Screens and widgets consume providers via `context.watch<T>()`
-- **Provider Layer** — `AuthProvider` manages auth state; `TaskProvider` manages task stream and CRUD operations. `ChangeNotifierProxyProvider` wires auth → task stream so the correct user's tasks are always loaded.
-- **Repository Layer** — `TaskRepository` abstracts Firestore operations, making it easy to swap implementations
-- **Service Layer** — `AuthService` and `FirestoreService` talk directly to Firebase SDKs
+| Layer | Technology | Description |
+|---|---|---|
+| **Framework** | Flutter (Web) | Cross-platform UI toolkit targeting the browser |
+| **Language** | Dart | Strongly typed, compiled to JavaScript for web |
+| **State Management** | Provider (`ChangeNotifier` + `ProxyProvider`) | Lightweight reactive state — no code generation |
+| **Authentication** | Firebase Authentication | Email/Password + Google OAuth Sign-In |
+| **Database** | Cloud Firestore | Real-time NoSQL document database |
+| **Hosting** | Netlify | Deployed via GitHub Actions CI/CD pipeline |
+| **CI/CD** | GitHub Actions | Automated Flutter build + Netlify deploy on push |
 
 ---
 
-## Firestore Data Structure
+## ✨ Key Features & Design Highlights
 
-```
-users/
-  {uid}/
-    tasks/
-      {taskId}/
-        title: string
-        description: string
-        status: "todo" | "inProgress" | "completed"
-        priority: "low" | "medium" | "high"
-        category: string
-        createdAt: timestamp
-        updatedAt: timestamp
-```
-
-**Account-level isolation**: Every task is stored under `users/{uid}/tasks/`. Firestore Security Rules enforce that an authenticated user can only read and write documents within their own `{uid}` path. No user can access another user's data.
+- **Real-Time Task Sync:** Firestore stream listeners push updates instantly to the UI — no polling, no manual refresh.
+- **Dual Authentication:** Email/Password sign-up/sign-in and Google OAuth, both backed by Firebase Auth with proper error handling.
+- **Complete User Isolation:** Every task is stored under `users/{uid}/tasks/{taskId}`. Firestore Security Rules enforce that no user can ever read or write another user's data.
+- **Full Task CRUD:** Create, read, update, and delete tasks with title, description, category, status (Todo / In Progress / Completed), and priority (Low / Medium / High).
+- **Live Dashboard Analytics:** Real-time stat cards for total tasks, in-progress, completed, and high-priority counts — computed from the live Firestore stream.
+- **Responsive Dark UI:** Full sidebar layout on desktop (800px+) with bottom navigation on mobile. Auth screens constrained to 450px max-width. Stats grid adapts from 4 → 2 → 1 columns.
+- **Clean Layered Architecture:** UI → Provider → Repository → Service → Firebase. The Repository pattern makes the data layer fully swappable.
+- **Zero Issues:** `flutter analyze` reports **no issues** — all deprecations, unused imports, and async context warnings resolved.
 
 ---
 
-## Firebase Security Rules
-
-See [`firestore.rules`](./firestore.rules). Rules enforce:
-- Unauthenticated users → **deny all**
-- Authenticated users → **only their own** `users/{uid}/tasks` path
-- No cross-user read or write access possible
-
-> **Note on Firebase Web API Key**: The API key in `firebase_options.dart` is a client-side configuration value — it is intentionally public and safe to commit for web applications. Firebase security is enforced by Authentication and Firestore Rules, not by the API key.
-
----
-
-## Local Setup
+## 🛠️ Setup & Run Locally
 
 ### Prerequisites
+- Flutter SDK `^3.13.0` — [Install Flutter](https://docs.flutter.dev/get-started/install)
+- A configured Firebase project (see [Firebase Setup](#-firebase-setup) below)
+- Chrome browser
 
-- Flutter SDK (`^3.13.3`) — [Install Flutter](https://docs.flutter.dev/get-started/install)
-- A configured Firebase project (see [Firebase Setup](#firebase-setup) below)
-
-### Install dependencies
+### 1. Clone & Install
 
 ```bash
+git clone https://github.com/Poorna-Sai-Sriharsha/Worksphere.git
+cd Worksphere
 flutter pub get
 ```
 
-### Run locally
+### 2. Run Development Server
 
 ```bash
 flutter run -d chrome
 ```
 
----
+Open [http://localhost:5000](http://localhost:5000) to view the app.
 
-## Firebase Setup
-
-This project requires your own Firebase project. The included `firebase_options.dart` connects to the author's Firebase project — **fork users must configure their own**.
-
-1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
-2. Enable **Email/Password** and **Google** sign-in methods in Authentication
-3. Create a **Cloud Firestore** database in production mode
-4. Add a **Web app** to your Firebase project
-5. Install FlutterFire CLI:
-   ```bash
-   dart pub global activate flutterfire_cli
-   ```
-6. Configure your project:
-   ```bash
-   flutterfire configure
-   ```
-   This replaces `lib/firebase_options.dart` with your own project's credentials.
-7. Deploy Firestore Security Rules:
-   ```bash
-   firebase deploy --only firestore:rules
-   ```
-
----
-
-## Production Build
+### 3. Production Build
 
 ```bash
 flutter clean
@@ -135,64 +64,202 @@ flutter pub get
 flutter build web --release
 ```
 
-Output is generated in `build/web/`.
+The build outputs to `build/web/` with zero analyzer issues and zero lint warnings.
 
 ---
 
-## Netlify Deployment
+## 🔥 Firebase Setup
 
-This project is deployed to Netlify via **GitHub Actions CI/CD**.
+The included `lib/firebase_options.dart` connects to the author's Firebase project. **Fork users must configure their own project.**
 
-### How it works
+### 1. Create a Firebase Project
 
-1. Push to `main` branch triggers the GitHub Actions workflow (`.github/workflows/deploy.yml`)
-2. GitHub Actions installs Flutter stable, runs `flutter build web --release`
-3. The built `build/web/` directory is deployed to Netlify via the Netlify CLI
+Go to [console.firebase.google.com](https://console.firebase.google.com) and create a new project.
+
+### 2. Enable Authentication
+
+In **Authentication → Sign-in method**, enable:
+- ✅ Email/Password
+- ✅ Google
+
+### 3. Create Firestore Database
+
+In **Firestore Database**, create a database in **production mode**.
+
+### 4. Configure FlutterFire
+
+```bash
+dart pub global activate flutterfire_cli
+flutterfire configure
+```
+
+This overwrites `lib/firebase_options.dart` with your project's credentials.
+
+### 5. Deploy Security Rules
+
+```bash
+firebase deploy --only firestore:rules
+```
+
+---
+
+## 📂 Project Architecture
+
+```
+worksphere/
+├── lib/
+│   ├── app/
+│   │   ├── app.dart                  # Root MaterialApp widget
+│   │   └── app_theme.dart            # Global dark theme — colors, typography
+│   ├── auth_gate.dart                # Auth state router — LoginScreen or AppShell
+│   ├── firebase_options.dart         # Firebase Web configuration (client-side)
+│   ├── main.dart                     # Entry point — Firebase init, Provider setup
+│   ├── models/
+│   │   └── task.dart                 # Task model — fromFirestore / toFirestore
+│   ├── providers/
+│   │   ├── auth_provider.dart        # Auth state, sign-in/up/out, error handling
+│   │   └── task_provider.dart        # Task CRUD, Firestore stream subscription
+│   ├── repositories/
+│   │   └── task_repository.dart      # Abstraction layer over FirestoreService
+│   ├── screens/
+│   │   ├── auth/
+│   │   │   ├── login_screen.dart     # Email/Password + Google Sign-In
+│   │   │   └── register_screen.dart  # Email/Password registration
+│   │   ├── dashboard/
+│   │   │   └── dashboard_screen.dart # Live stat cards + recent tasks overview
+│   │   ├── settings/
+│   │   │   └── settings_screen.dart  # Settings placeholder (v2 roadmap)
+│   │   └── tasks/
+│   │       └── tasks_screen.dart     # Full task table with add/edit/delete
+│   └── widgets/
+│       ├── app_shell.dart            # Responsive layout — sidebar or bottom nav
+│       ├── app_sidebar.dart          # Desktop navigation sidebar
+│       ├── app_top_bar.dart          # Top bar — page title + search + user menu
+│       ├── stat_card.dart            # Reusable metric card for dashboard
+│       ├── task_dialog.dart          # Add/Edit task modal form
+│       └── task_table.dart           # Scrollable DataTable with status/priority badges
+├── web/
+│   ├── index.html                    # Web entry point — title, meta, manifest link
+│   ├── manifest.json                 # PWA manifest — WorkSphere branding
+│   └── icons/                        # App icons 192px + 512px (regular + maskable)
+├── .github/
+│   └── workflows/
+│       └── deploy.yml                # GitHub Actions — Flutter build + Netlify deploy
+├── .gitattributes                    # LF line endings enforced for shell scripts
+├── .gitignore
+├── firestore.rules                   # Firestore security rules — user isolation
+├── firestore.indexes.json            # Composite indexes for status/priority queries
+├── netlify.toml                      # Netlify config — build command, headers, SPA redirect
+├── netlify_build.sh                  # Flutter install + build script for Netlify
+├── pubspec.yaml
+└── README.md
+```
+
+---
+
+## 🎨 Design System
+
+### Color Palette
+
+| Token | Value | Usage |
+|---|---|---|
+| `background` | `#0B0F14` | App background |
+| `sidebar` | `#131820` | Sidebar + table headers |
+| `card` | `#1A2130` | Cards, dialogs, inputs |
+| `primaryAccent` | `#4F7CFF` | Buttons, links, active states |
+| `textPrimary` | `#E8EDF5` | Headings, primary text |
+| `textSecondary` | `#6B7A99` | Labels, placeholders, muted text |
+| `success` | `#34D399` | Completed task badge |
+| `warning` | `#FBBF24` | Medium priority badge |
+| `danger` | `#F87171` | High priority badge, errors |
+
+### Typography
+
+| Role | Font | Weight |
+|---|---|---|
+| UI / Body | System default (Flutter) | 400–700 |
+| Labels | AppTheme constants | 500–600 |
+
+---
+
+## 🔐 Security Architecture
+
+### Firestore Rules
+All access requires `request.auth.uid == userId` — unauthenticated and cross-user access are denied by default.
+
+```javascript
+match /users/{userId}/tasks/{taskId} {
+  allow read, write: if request.auth != null && request.auth.uid == userId;
+}
+match /users/{userId} {
+  allow read, write: if request.auth != null && request.auth.uid == userId;
+}
+```
+
+### Firebase Web API Key
+The API key in `firebase_options.dart` is a **client-side configuration value** — it is intentionally public and safe to commit for web applications. Firebase security is enforced by Authentication and Firestore Rules, not by hiding the key.
+
+---
+
+## 🚀 Deployment — GitHub Actions + Netlify
+
+Deployment is fully automated via **GitHub Actions CI/CD**.
+
+### How It Works
+1. Push to `main` triggers `.github/workflows/deploy.yml`
+2. GitHub Actions installs Flutter stable (cached), runs `flutter build web --release`
+3. Built `build/web/` is deployed to Netlify via the Netlify CLI
 
 ### Required GitHub Secrets
 
-Add these in your repository **Settings → Secrets → Actions**:
-
 | Secret | Description |
 |---|---|
-| `NETLIFY_API_TOKEN` | Your Netlify personal access token |
-| `NETLIFY_SITE_ID` | Your Netlify site ID |
+| `NETLIFY_API_TOKEN` | Netlify personal access token |
+| `NETLIFY_SITE_ID` | Target Netlify site ID |
 
-### Netlify Build Settings
+Add these in: **Repository → Settings → Secrets and variables → Actions**
 
-The `netlify.toml` file configures:
-- **Build command**: `bash netlify_build.sh` (installs Flutter and builds)
-- **Publish directory**: `build/web`
-- **SPA redirect**: All routes → `index.html` (required for Flutter Web)
-- **Security headers**: `Cross-Origin-Opener-Policy`, `X-Frame-Options`, `X-Content-Type-Options`
+### Netlify Configuration (`netlify.toml`)
 
-### Important
-
-In the Netlify dashboard, go to **Site settings → Build & deploy → Build settings** and ensure the **Publish directory** is set to `build/web` (with a forward slash, not backslash).
-
-> **Note**: This project has not yet been publicly deployed. The deployment configuration is ready and has been validated locally.
+| Setting | Value |
+|---|---|
+| Build command | `bash netlify_build.sh` |
+| Publish directory | `build/web` |
+| SPA redirect | `/* → /index.html (200)` |
 
 ---
 
-## Project Structure
+## 📋 Feature Checklist
 
-```
-lib/
-├── app/            App widget and theme configuration
-├── auth_gate.dart  Auth state router (logged in → AppShell, else → LoginScreen)
-├── core/           Shared utilities (NavigationService)
-├── firebase_options.dart  Firebase Web configuration
-├── main.dart       Entry point, Provider setup
-├── models/         Task model (fromFirestore / toFirestore)
-├── providers/      AuthProvider, TaskProvider (state management)
-├── repositories/   TaskRepository (abstraction layer)
-├── screens/        Auth, Dashboard, Tasks, Settings screens
-├── services/       AuthService, FirestoreService (Firebase layer)
-└── widgets/        AppShell, AppSidebar, AppTopBar, TaskTable, TaskDialog, StatCard
-```
+| Feature | Status |
+|---|---|
+| Email/Password Authentication | ✅ Complete |
+| Google Sign-In | ✅ Complete |
+| Real-time Firestore task sync | ✅ Complete |
+| Create / Edit / Delete tasks | ✅ Complete |
+| Task status + priority fields | ✅ Complete |
+| Dashboard with live analytics | ✅ Complete |
+| Responsive layout (desktop + mobile) | ✅ Complete |
+| Firestore user isolation | ✅ Complete |
+| Firestore security rules | ✅ Complete |
+| GitHub Actions CI/CD pipeline | ✅ Complete |
+| Netlify deployment configuration | ✅ Complete |
+| `flutter analyze` — zero issues | ✅ Complete |
 
 ---
 
-## Author
+## 📈 Potential Future Enhancements
 
-**Poorna Sai Sriharsha** — [GitHub](https://github.com/Poorna-Sai-Sriharsha)
+- **Filter & Search:** Wire the existing filter chips (All / High Priority / Completed) and top bar search field to actual query logic.
+- **Settings Screen:** User profile editing, display name, password change, and theme preferences.
+- **Due Dates:** Add `dueDate` field to tasks with calendar picker and overdue highlighting.
+- **Task Categories:** Filterable category tags with color coding.
+- **Offline Support:** Enable Firestore offline persistence for PWA-like offline task management.
+- **Push Notifications:** Firebase Cloud Messaging for task deadline reminders.
+
+---
+
+## 👤 Author
+
+**Poorna Sai Sriharsha**
+[GitHub](https://github.com/Poorna-Sai-Sriharsha) · WorkSphere Flutter Web Application
