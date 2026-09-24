@@ -1,0 +1,20 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default: deny all access unless explicitly allowed below
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // User task isolation:
+    // - Only authenticated users can access their own tasks
+    // - A user can only read, create, update, and delete their own tasks
+    // - No user can access another user's tasks
+    match /users/{userId}/tasks/{taskId} {
+      allow read, create, update, delete: if request.auth != null
+                                          && request.auth.uid == userId;
+    }
+  }
+}

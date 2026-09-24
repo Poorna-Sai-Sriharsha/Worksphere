@@ -1,0 +1,26 @@
+# WorkSphere — Git line ending configuration
+# Ensures shell scripts keep LF endings for Linux/Netlify execution
+
+# Default: auto-normalize for text files
+* text=auto
+
+# Shell scripts MUST use LF on all platforms (Netlify runs Linux)
+*.sh text eol=lf
+
+# Dart and config files: LF preferred
+*.dart text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+
+# Binary files: no transformation
+*.png binary
+*.jpg binary
+*.ico binary
+*.ttf binary
+*.woff binary
+*.woff2 binary

@@ -1,12 +1,12 @@
 {
-    "name": "worksphere",
-    "short_name": "worksphere",
+    "name": "WorkSphere",
+    "short_name": "WorkSphere",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#0B0F14",
+    "theme_color": "#4F7CFF",
+    "description": "WorkSphere — Professional task management built with Flutter and Firebase.",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {

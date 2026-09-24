@@ -1,4 +1,25 @@
+# WorkSphere — Netlify Configuration
+#
+# DEPLOYMENT STRATEGY:
+# GitHub Actions (see .github/workflows/deploy.yml) is the primary CI/CD pipeline.
+# It installs Flutter, runs `flutter build web --release`, and deploys build/web to Netlify.
+#
+# This netlify.toml uses netlify_build.sh as a fallback for direct Netlify auto-deploys.
+
+[build]
+  command = "bash netlify_build.sh"
+  publish = "build/web"
+
 [[headers]]
   for = "/*"
   [headers.values]
     Cross-Origin-Opener-Policy = "same-origin-allow-popups"
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+
+# SPA fallback: serve index.html for all paths
+# Required for Flutter Web — prevents 404 on page refresh
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

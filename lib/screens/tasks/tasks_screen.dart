@@ -186,7 +186,7 @@ class TasksScreen extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.assignment_outlined, size: 64, color: AppTheme.textSecondary.withOpacity(0.3)),
+          Icon(Icons.assignment_outlined, size: 64, color: AppTheme.textSecondary.withValues(alpha: 0.3)),
           const SizedBox(height: 16),
           const Text(
             'No tasks found',
@@ -216,13 +216,14 @@ class TasksScreen extends StatelessWidget {
             status: value['status'],
           );
         } else {
+          final status = value['status'] as TaskStatus;
+          final priority = value['priority'] as TaskPriority;
           await provider.updateTask(task.id, {
             'title': value['title'],
             'description': value['description'],
             'category': value['category'],
-            'status': value['status'],
-            'priority': value['priority'],
-            'updatedAt': DateTime.now(),
+            'status': status.name,
+            'priority': priority.name,
           });
         }
       }

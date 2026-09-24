@@ -18,7 +18,6 @@ class DashboardScreen extends StatelessWidget {
     final completedTasks = tasks.where((t) => t.status == TaskStatus.completed).length;
     final inProgressTasks = tasks.where((t) => t.status == TaskStatus.inProgress).length;
     final highPriorityTasks = tasks.where((t) => t.priority == TaskPriority.high).length;
-    final progress = totalTasks == 0 ? 0.0 : completedTasks / totalTasks;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
@@ -123,7 +122,7 @@ class DashboardScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.card,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.textSecondary.withOpacity(0.1)),
+        border: Border.all(color: AppTheme.textSecondary.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,7 +163,7 @@ class DashboardScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.card,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.textSecondary.withOpacity(0.1)),
+        border: Border.all(color: AppTheme.textSecondary.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

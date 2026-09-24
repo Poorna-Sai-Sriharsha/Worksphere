@@ -42,7 +42,7 @@ class AppTopBar extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppTheme.card,
                 borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: AppTheme.textSecondary.withOpacity(0.1)),
+                border: Border.all(color: AppTheme.textSecondary.withValues(alpha: 0.1)),
               ),
               child: TextField(
                 style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13),

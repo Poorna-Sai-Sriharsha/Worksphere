@@ -35,6 +35,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  // --- Async handler on State (use this.context after mounted check) ---
+
+  Future<void> _handleRegister() async {
+    final authProvider = context.read<AuthProvider>();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final confirm = _confirmPasswordController.text.trim();
+
+    if (_nameController.text.trim().isEmpty || email.isEmpty || password.isEmpty) {
+      _showError('Please fill in all fields');
+      return;
+    }
+
+    if (password != confirm) {
+      _showError('Passwords do not match');
+      return;
+    }
+
+    await authProvider.signUp(email, password);
+
+    if (!mounted) return;
+    if (authProvider.errorMessage != null) {
+      _showError(authProvider.errorMessage!);
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppTheme.danger,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  // --- Build ---
+
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
@@ -112,33 +150,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       SizedBox(
                         height: 48,
                         child: ElevatedButton(
-                          onPressed: authProvider.isLoading
-                              ? null
-                              : () async {
-                                  final email = _emailController.text.trim();
-                                  final password = _passwordController.text.trim();
-                                  final confirm = _confirmPasswordController.text.trim();
-
-                                  if (_nameController.text.trim().isEmpty ||
-                                      email.isEmpty ||
-                                      password.isEmpty) {
-                                    if (!mounted) return;
-                                    _showError(context, 'Please fill in all fields');
-                                    return;
-                                  }
-
-                                  if (password != confirm) {
-                                    if (!mounted) return;
-                                    _showError(context, 'Passwords do not match');
-                                    return;
-                                  }
-
-                                  await authProvider.signUp(email, password);
-                                  if (!mounted) return;
-                                  if (authProvider.errorMessage != null) {
-                                    _showError(context, authProvider.errorMessage!);
-                                  }
-                                },
+                          onPressed: authProvider.isLoading ? null : _handleRegister,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.primaryAccent,
                             foregroundColor: Colors.white,
@@ -229,16 +241,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(4),
         borderSide: const BorderSide(color: AppTheme.danger),
-      ),
-    );
-  }
-
-  void _showError(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppTheme.danger,
-        behavior: SnackBarBehavior.floating,
       ),
     );
   }

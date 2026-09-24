@@ -29,6 +29,49 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  // --- Async handlers on State (use this.context after mounted check) ---
+
+  Future<void> _handleSignIn() async {
+    final authProvider = context.read<AuthProvider>();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      _showError('Please enter both email and password');
+      return;
+    }
+
+    await authProvider.signIn(email, password);
+
+    if (!mounted) return;
+    if (authProvider.errorMessage != null) {
+      _showError(authProvider.errorMessage!);
+    }
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    final authProvider = context.read<AuthProvider>();
+
+    await authProvider.signInWithGoogle();
+
+    if (!mounted) return;
+    if (authProvider.errorMessage != null) {
+      _showError(authProvider.errorMessage!);
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppTheme.danger,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  // --- Build ---
+
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
@@ -101,24 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(
                         height: 48,
                         child: ElevatedButton(
-                          onPressed: authProvider.isLoading
-                              ? null
-                              : () async {
-                                  final email = _emailController.text.trim();
-                                  final password = _passwordController.text.trim();
-
-                                  if (email.isEmpty || password.isEmpty) {
-                                    if (!mounted) return;
-                                    _showError(context, 'Please enter both email and password');
-                                    return;
-                                  }
-
-                                  await authProvider.signIn(email, password);
-                                  if (!mounted) return;
-                                  if (authProvider.errorMessage != null) {
-                                    _showError(context, authProvider.errorMessage!);
-                                  }
-                                },
+                          onPressed: authProvider.isLoading ? null : _handleSignIn,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.primaryAccent,
                             foregroundColor: Colors.white,
@@ -159,15 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(
                         height: 48,
                         child: OutlinedButton.icon(
-                          onPressed: authProvider.isLoading
-                              ? null
-                              : () async {
-                                  await authProvider.signInWithGoogle();
-                                  if (!mounted) return;
-                                  if (authProvider.errorMessage != null) {
-                                    _showError(context, authProvider.errorMessage!);
-                                  }
-                                },
+                          onPressed: authProvider.isLoading ? null : _handleGoogleSignIn,
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppTheme.textPrimary,
                             side: const BorderSide(color: AppTheme.textSecondary),
@@ -250,16 +268,6 @@ class _LoginScreenState extends State<LoginScreen> {
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(4),
         borderSide: const BorderSide(color: AppTheme.danger),
-      ),
-    );
-  }
-
-  void _showError(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppTheme.danger,
-        behavior: SnackBarBehavior.floating,
       ),
     );
   }
