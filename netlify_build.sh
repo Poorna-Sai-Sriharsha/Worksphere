@@ -1,18 +1,29 @@
 #!/bin/bash
 # netlify_build.sh
-# This script is used by Netlify to build the Flutter web app.
-# It installs Flutter (stable channel) and runs the production build.
-# Note: GitHub Actions is the primary CI/CD pipeline (see .github/workflows/deploy.yml)
-# This script serves as a fallback for direct Netlify deploys.
+# Installs Flutter (stable) if not already cached, then builds Flutter Web.
+# Netlify caches the build directory between deploys — we reuse it when valid.
 
-set -e  # Exit immediately if a command exits with a non-zero status
+set -e  # Exit immediately on error
 
-echo "Installing Flutter..."
-git clone https://github.com/flutter/flutter.git --depth 1 --branch stable flutter
-export PATH="$PATH:$(pwd)/flutter/bin"
+FLUTTER_DIR="flutter"
+FLUTTER_BIN="$FLUTTER_DIR/bin/flutter"
+
+# --- Install Flutter (skip if already cached) ---
+if [ -f "$FLUTTER_BIN" ]; then
+  echo "Flutter already cached — skipping install."
+else
+  echo "Flutter not found — cloning stable channel..."
+  rm -rf "$FLUTTER_DIR"  # Remove any partial/corrupt directory
+  git clone https://github.com/flutter/flutter.git \
+    --depth 1 \
+    --branch stable \
+    "$FLUTTER_DIR"
+fi
+
+export PATH="$PATH:$(pwd)/$FLUTTER_DIR/bin"
 
 echo "Flutter version:"
-flutter --version
+flutter --version --machine
 
 echo "Disabling analytics..."
 flutter config --no-analytics
@@ -23,5 +34,5 @@ flutter pub get
 echo "Building Flutter Web (release)..."
 flutter build web --release
 
-echo "Build complete. Output in build/web/"
+echo "Build complete. Output:"
 ls -la build/web/
