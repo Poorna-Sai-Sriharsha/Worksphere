@@ -1,5 +1,7 @@
 # 🗂️ WorkSphere — Task Management Application
 
+![WorkSphere Banner](WorkSphere.png)
+
 **A full-stack Flutter Web task management application** built with Firebase Authentication and Cloud Firestore. WorkSphere provides a clean, professional workspace for individuals to create, organize, and track tasks in real-time — featuring Google Sign-In, live Firestore sync, a responsive dark UI, and a complete CI/CD pipeline deploying to Netlify via GitHub Actions.
 
 🌐 **Status:** Production-Ready · Netlify Deployment · Real-Time Cloud Sync
