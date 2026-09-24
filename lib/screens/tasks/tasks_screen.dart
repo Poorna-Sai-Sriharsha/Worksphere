@@ -216,7 +216,14 @@ class TasksScreen extends StatelessWidget {
             status: value['status'],
           );
         } else {
-          await provider.updateTaskStatus(task.id, value['status']);
+          await provider.updateTask(task.id, {
+            'title': value['title'],
+            'description': value['description'],
+            'category': value['category'],
+            'status': value['status'],
+            'priority': value['priority'],
+            'updatedAt': DateTime.now(),
+          });
         }
       }
     });
